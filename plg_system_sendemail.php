@@ -14,6 +14,7 @@ defined('_JEXEC') or die;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Session\Session;
+use Joomla\Utilities\ArrayHelper;
 
 JHtml::_('jquery.token');
 
@@ -46,6 +47,37 @@ class PlgSystemplg_System_Sendemail extends JPlugin
 		Text::script('PLG_SYSTEM_SENDEMAIL_POPUP_EMAIL_BODY_MESSAGE');
 		Text::script('PLG_SYSTEM_SENDEMAIL_POPUP_SEND_BTN');
 
+		$document = Factory::getDocument();
+
+		$style = '.is-progress {
+					background-color: #EEF2F6;
+					cursor: not-allowed;
+					z-index: 5;
+					opacity: 0.6;
+					-webkit-transition: background-color 500ms ease-out 1s;
+					-moz-transition: background-color 500ms ease-out 1s;
+					-o-transition: background-color 500ms ease-out 1s;
+					transition: background-color 500ms ease-out 1s;
+					position: relative;
+
+				}
+
+				.is-progress:before {
+					font-family: "FontAwesome";
+					content: "\f110";
+					position: absolute;
+					z-index:1040;
+					left: 50%;
+					top: 50%;
+					font-size: 45px;
+					color: #1664bd;
+					-webkit-animation: fa-spin 2s infinite linear;
+					animation: fa-spin 2s infinite linear;
+					transform: translate(-50%, -50%);
+					text-align: center;
+				}';
+		$document->addStyleDeclaration($style);
+
 		parent::__construct($subject, $config);
 	}
 
@@ -77,7 +109,6 @@ class PlgSystemplg_System_Sendemail extends JPlugin
 			jexit();
 		}
 
-		$templateData = $app->input->post->get('template', '', 'array');
 		$emails = $app->input->post->get('emails', '', 'array');
 
 		if (empty($emails))
@@ -93,25 +124,36 @@ class PlgSystemplg_System_Sendemail extends JPlugin
 			$emails = array_unique($emails);
 
 			// The mail subject.
-			$emailSubject = $templateData['subject'];
+			$emailSubject =  $app->input->post->get('subject');
 
 			// The mail body.
-			$emailBody = $templateData['message'];
+			$emailBody = $app->input->post->get('message', '', 'RAW');
+
+			$emailCount = array();
+
+			$sendEmailcount = 0;
+			$failEmailcount = 0;
 
 			foreach ($emails as $singleEmail)
 			{
 				// Send Email
-				Factory::getMailer()->sendMail(
-					$config->get('mailfrom'),
-					$config->get('fromname'),
-					trim($singleEmail),
-					$emailSubject,
-					$emailBody,
-					true
-				);
+				$return = Factory::getMailer()->sendMail($config->get('mailfrom'), $config->get('fromname'), trim($singleEmail), $emailSubject, $emailBody, true);
+
+				// Check for an error.
+				if ($return !== true)
+				{
+					$failEmailcount ++;
+				}
+				else
+				{
+					$sendEmailcount ++;
+				}
 			}
 
-			echo new JResponseJson(null, Text::_('PLG_SYSTEM_SENDEMAIL_SUCCESSFULLY_SEND'), false);
+			$emailCount['fail'] = $failEmailcount;
+			$emailCount['send'] = $sendEmailcount;
+
+			echo new JResponseJson($emailCount, JText::_('PLG_SYSTEM_SENDEMAIL_SUCCESSFULLY_SEND'), false);
 
 			jexit();
 		}

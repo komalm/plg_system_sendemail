@@ -13,20 +13,27 @@ jQuery(document).ready(function() {
 	tjutilitysendemail.initialize();
 
 	var isSendEmail = jQuery('body').find(tjutilitysendemail.tjTdClass).length;
+
 	if (isSendEmail)
 	{
-			tinymce.init({
-			selector: 'textarea',
+		tjutilitysendemail.loadTinymce();
+	}
+});
+
+var tjutilitysendemail = {
+    loadTinymce: function() {
+		//~ console.log('tjutilitysendemail.loadTinymce');
+		tinymce.remove();
+		tinymce.init({
+			selector: 'textarea#email-message',
 			setup: function (editor) {
 				editor.on('change', function () {
 					tinymce.triggerSave();
 				});
 			}
 		});
-	}
-});
 
-var tjutilitysendemail = {
+	},
     initialize: function() {
 		var isSendEmail = jQuery('body').find(tjutilitysendemail.tjTdClass).length;
 		var isCheckboxes = jQuery('body').find('input[name="cid[]"]').length;
@@ -70,7 +77,7 @@ var tjutilitysendemail = {
 	},
 	openEmailPopup: function () {
 		try {
-
+			tjutilitysendemail.loadTinymce();
 			var emailSubject = 'email-subject';
 			var emailMessage = 'email-message';
 
@@ -85,8 +92,8 @@ var tjutilitysendemail = {
 
 			var modelEmail = '<div id="bulkEmailModal" class="emailModal modal fade" role="dialog">';
 					modelEmail += '<div class="modal-dialog">';
-						modelEmail += '<div class="modal-content">';
-						modelEmail += '<div id="preload"><img src="http://i.imgur.com/KUJoe.gif"></div>';
+						modelEmail += '<div class="modal-content is-progress" id="emailPopup">';
+						modelEmail += '<div id="preload"></div>';
 								modelEmail += '<div class="modal-header">';
 									modelEmail += '<div class="row-fluid">';
 										modelEmail += '<div class="span10">';
@@ -142,6 +149,7 @@ var tjutilitysendemail = {
 			jQuery('#j-main-container').append(modelEmail);
 
 			jQuery('div').find("#preload").hide();
+			jQuery('div').find(".is-progress").removeClass('is-progress');
 			jQuery('div').find("#send-email").attr("disabled", false);
 			jQuery("#" + emailSubject).val('');
 			jQuery("#" + emailMessage).val('');
@@ -176,12 +184,22 @@ var tjutilitysendemail = {
 		var emailMessageValue = jQuery("#email-message").val();
 		var invalidCount = 0;
 
+		jQuery("#errorMessage").empty();
+
 		if (!emailSubjectValue)
 		{
 			invalidCount = 1;
 
 			jQuery('#email-subject').addClass("invalid");
 			jQuery('#email-subject-label').addClass("invalid");
+
+			var errormsg = '<div class="alert alert-error alert-danger"><button type="button" data-dismiss="alert" class="close">×</button><h4 class="alert-heading"></h4><div>Field required: Subject</div></div>';
+			jQuery("#bulkEmailModal").find("#errorMessage").append(errormsg);
+		}
+		else
+		{
+			jQuery('#email-subject').removeClass("invalid");
+			jQuery('#email-subject-label').removeClass("invalid");
 		}
 
 		if (!emailMessageValue)
@@ -190,6 +208,14 @@ var tjutilitysendemail = {
 
 			jQuery('#email-message').addClass("invalid");
 			jQuery('#email-message-label').addClass("invalid");
+
+			var errormsg = '<div class="alert alert-error alert-danger"><button type="button" data-dismiss="alert" class="close">×</button><h4 class="alert-heading"></h4><div>Field required: Message</div></div>';
+			jQuery("#bulkEmailModal").find("#errorMessage").append(errormsg);
+		}
+		else
+		{
+			jQuery('#email-message').removeClass("invalid");
+			jQuery('#email-message-label').removeClass("invalid");
 		}
 
 		if (invalidCount)
@@ -198,6 +224,7 @@ var tjutilitysendemail = {
 		}
 
 		jQuery('#preload').show();
+		jQuery('div').find("#emailPopup").addClass('is-progress');
 		jQuery('#send-email').attr("disabled", true);
 		var chunk_size = 5;
 
@@ -244,6 +271,8 @@ var tjutilitysendemail = {
 				if (index == batchCount)
 				{
 					jQuery('#preload').hide();
+					jQuery('div').find(".is-progress").removeClass('is-progress');
+					jQuery('div').find(".is-progress").removeClass('is-progress');
 					jQuery('#bulkEmailModal').modal('hide');
 
 					 // Remove below line removeclass it is temp added

@@ -14,6 +14,8 @@
 	<files>
 		<filename plugin="plg_system_sendemail">plg_system_sendemail.php</filename>
 		<filename>bulksendemail.js</filename>
+		<folder>js</folder>
+		<folder>plg_system_sendemail</folder>
 	</files>
 
 	<languages folder="language">

@@ -1,0 +1,5 @@
+var tjEmailService = {
+	postData: function() {
+
+	}
+}
