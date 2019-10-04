@@ -131,6 +131,12 @@ window.tjSendEmail.UI.prototype.sendEmail = function () {
 			{
 				if (res.success == true)
 				{
+					sendEmailCount = res.data.send + sendEmailCount;
+					failEmailCount = res.data.fail + failEmailCount;
+
+					res.data.send = sendEmailCount;
+					res.data.fail = failEmailCount;
+
 					if (value.index == value.batchCount)
 					{
 						jQuery('#preload').hide();

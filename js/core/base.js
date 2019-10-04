@@ -1,7 +1,5 @@
 'use strict';
 /** global: com_jgive */
-var sendEmailCount = 0;
-var failEmailCount = 0;
 tjSendEmail.Services.Base = Class.extend({
     /**
      * @param   string  url       API Request URL
@@ -53,13 +51,6 @@ tjSendEmail.Services.Base = Class.extend({
             beforeSend: function () {
             },
             success: function (res) {
-
-				sendEmailCount = res.data.send + sendEmailCount;
-				failEmailCount = res.data.fail + failEmailCount;
-
-				res.data.send = sendEmailCount;
-				res.data.fail = failEmailCount;
-
                 cb(null, res);
             },
             error: function (err) {
