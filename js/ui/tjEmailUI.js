@@ -1,7 +1,5 @@
 window.tjSendEmail.UI = function (tjTableId, tjTdClass, checkBoxName) {
 
-	tinymce.remove();
-
 	this.tjTableId = tjTableId;
 	this.tjTdClass = '.' + tjTdClass;
 	this.checkBoxName = checkBoxName;
@@ -71,6 +69,7 @@ window.tjSendEmail.UI.prototype.btnSendEmail = function () {
 
 // After click on send email button prepare popup
 window.tjSendEmail.UI.prototype.preparePopup =  function () {
+
 	if (document.adminForm.boxchecked.value==0)
 	{
 		alert(Joomla.JText._('PLG_SYSTEM_SENDEMAIL_SELECT_CHECKBOX'));
@@ -99,7 +98,8 @@ window.tjSendEmail.UI.prototype.preparePopup =  function () {
 				jQuery('div').find("#tj-send-email").attr("disabled", false);
 				jQuery("#message").val('');
 				jQuery("#subject").val('');
-				//~ tinyMCE.activeEditor.setContent('');
+				// tinymce.init({selector: '#message'});
+				// jQuery("#message").val('');
 
 				jQuery.each(jQuery("input[name='" + self.checkBoxName + "[]']:checked").closest("td").siblings("td" + self.tjTdClass), function () {
 					var hiddenEle = "<input readonly type='hidden' name='emails[]' value='" + jQuery(this).text() + "'/>";
@@ -164,28 +164,32 @@ window.tjSendEmail.UI.prototype.sendEmail = function () {
 // Before send Email check validation subject and message are not empty
 window.tjSendEmail.UI.prototype.validate =  function () {
 
-	var emailSubjectValue = jQuery("#subject").val();
-	var emailMessageValue = jQuery("#message").val();
-
+	var thisForm = document.getElementById("emailTemplateForm");
+	var isValid = document.formvalidator.isValid(thisForm);
 	var invalidCount = 0;
 
-	if (!emailSubjectValue)
-	{
-		invalidCount = 1;
+	// Increase count if form validation false
+	if (!isValid) { invalidCount = 1; }
 
-		jQuery("#subject").addClass("invalid");
-		jQuery('#subject-lbl').addClass("invalid");
-	}
+	var emailMessageValue = jQuery("#message").val();
 
-	if (!emailMessageValue)
-	{
-		invalidCount = 1;
-
-		jQuery('#message-lbl').addClass("invalid");
-	}
+	// Increase count if editor value empty
+	if (!emailMessageValue) { invalidCount = 1; }
 
 	if (invalidCount)
 	{
+		var jformErrorMessage = jQuery('#system-message-container').html();
+		Joomla.removeMessages();
+
+		jQuery('#errorMessage').html(jformErrorMessage);
+
+		if (!emailMessageValue)
+		{
+			jQuery('#message-lbl').addClass("invalid");
+			var errormsg = '<div class="alert alert-error alert-danger"><button type="button" data-dismiss="alert" class="close">×</button><h4 class="alert-heading"></h4><div>Invalid field: Message</div></div>';
+			jQuery("#bulkEmailModal").find("#errorMessage").append(errormsg);
+		}
+
 		return false;
 	}
 

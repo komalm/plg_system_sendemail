@@ -18,7 +18,6 @@ $lang->load('plg_system_sendemail', JPATH_ADMINISTRATOR);
 JForm::addFormPath(JPATH_SITE . '/plugins/system/plg_system_sendemail/plg_system_sendemail/tmpl');
 $form = JForm::getInstance('email', 'form', array(), false);
 
-print_r($form);
 ?>
 <div id="bulkEmailModal" class="emailModal modal fade" role="dialog">
 	<div class="modal-dialog">
@@ -56,7 +55,7 @@ print_r($form);
 				</div>
 
 				<div class="modal-footer">
-					<button type="button" class="btn btn-primary validate" id="tj-send-email" onclick="window.email.sendEmail();"><?php echo JText::_('PLG_SYSTEM_SENDEMAIL_POPUP_SEND_BTN');?></button>
+					<button type="button" class="btn btn-primary" id="tj-send-email" onclick="window.email.sendEmail();"><?php echo JText::_('PLG_SYSTEM_SENDEMAIL_POPUP_SEND_BTN');?></button>
 				</div>
 			</div>
 		</div>

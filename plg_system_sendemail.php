@@ -11,6 +11,9 @@
 // No direct access.
 defined('_JEXEC') or die;
 
+// Popup form validation
+JHtml::_('behavior.formvalidator');
+
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Session\Session;
@@ -84,6 +87,56 @@ class PlgSystemplg_System_Sendemail extends JPlugin
 	/**
 	 * Ajax call funcation to send email
 	 *
+	 * @return  string
+	 *
+	 * @since  __DEPLOY_VERSION__
+	 */
+	public function onAjaxtj_GetHTML()
+	{
+		$app = Factory::getApplication();
+
+		// Load the layout & push variables
+		ob_start();
+		$layout = $this->buildLayoutPath('default');
+
+		include $layout;
+		$html = ob_get_contents();
+		ob_end_clean();
+
+		return $html;
+	}
+
+	/**
+	 * Build Layout path
+	 *
+	 * @param   string  $layout  Layout name
+	 *
+	 * @since   2.2
+	 *
+	 * @return   string  Layout Path
+	 */
+	public function buildLayoutPath($layout)
+	{
+		$app = JFactory::getApplication();
+
+		$core_file = dirname(__FILE__) . '/' . $this->_name . '/tmpl/default.php';
+
+		$override = JPATH_BASE . '/' . 'templates' . '/' . $app->getTemplate() . '/html/plugins/' .
+		$this->_type . '/' . $this->_name . '/' . 'default.php';
+
+		if (JFile::exists($override))
+		{
+			return $override;
+		}
+		else
+		{
+			return $core_file;
+		}
+	}
+
+	/**
+	 * Ajax call funcation to send email
+	 *
 	 * @return  none
 	 *
 	 * @since  __DEPLOY_VERSION__
@@ -124,7 +177,7 @@ class PlgSystemplg_System_Sendemail extends JPlugin
 			$emails = array_unique($emails);
 
 			// The mail subject.
-			$emailSubject =  $app->input->post->get('subject');
+			$emailSubject = $app->input->post->get('subject');
 
 			// The mail body.
 			$emailBody = $app->input->post->get('message', '', 'RAW');
