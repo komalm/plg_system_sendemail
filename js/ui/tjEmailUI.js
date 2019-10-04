@@ -118,6 +118,9 @@ window.tjSendEmail.UI.prototype.sendEmail = function () {
 		return false;
 	}
 
+	window.sendEmailCount = 0;
+	window.failEmailCount = 0;
+
 	var batchData = this.prepareBatch();
 
 	jQuery.each(batchData, function (index, value) {
@@ -131,11 +134,11 @@ window.tjSendEmail.UI.prototype.sendEmail = function () {
 			{
 				if (res.success == true)
 				{
-					sendEmailCount = res.data.send + sendEmailCount;
-					failEmailCount = res.data.fail + failEmailCount;
+					window.sendEmailCount = res.data.send + window.sendEmailCount;
+					window.failEmailCount = res.data.fail + window.failEmailCount;
 
-					res.data.send = sendEmailCount;
-					res.data.fail = failEmailCount;
+					// res.data.send = window.sendEmailCount;
+					// res.data.fail = window.failEmailCount;
 
 					if (value.index == value.batchCount)
 					{
@@ -146,7 +149,7 @@ window.tjSendEmail.UI.prototype.sendEmail = function () {
 						 // Remove below line removeclass it is temp added
 						 jQuery("div").find('.tjlms-wrapper').addClass("tjBs3");
 
-						 res.message = res.message + " successfully " + res.data.send + ", and fail " +  res.data.fail + ".";
+						 res.message = res.message + " successfully " + window.sendEmailCount + ", and fail " +  window.failEmailCount + ".";
 
 						 Joomla.renderMessages({"success":[res.message]});
 					}

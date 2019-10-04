@@ -1,7 +1,5 @@
 'use strict';
 
-var sendEmailCount = 0;
-var failEmailCount = 0;
 tjSendEmail.Services.sendEmail = new (tjSendEmail.Services.Base.extend({
 	url:"index.php?option=com_ajax&plugin=plg_System_Sendemail&format=json",
 	config: {
