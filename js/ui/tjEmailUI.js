@@ -12,6 +12,9 @@ window.tjSendEmail.UI = function (tjTableId, tjTdClass, checkBoxName) {
 	this.init();
 }
 
+var sendEmailCount = 0;
+var failEmailCount = 0;
+
 // Return true if send email field is avaliable on view
 window.tjSendEmail.UI.prototype.isSendEmail = function () {
 	if (jQuery('body').find(this.tjTdClass).length)
@@ -118,8 +121,6 @@ window.tjSendEmail.UI.prototype.sendEmail = function () {
 		return false;
 	}
 
-	window.sendEmailCount = 0;
-	window.failEmailCount = 0;
 
 	var batchData = this.prepareBatch();
 
@@ -134,11 +135,11 @@ window.tjSendEmail.UI.prototype.sendEmail = function () {
 			{
 				if (res.success == true)
 				{
-					window.sendEmailCount = res.data.send + window.sendEmailCount;
-					window.failEmailCount = res.data.fail + window.failEmailCount;
+					sendEmailCount = res.data.send + sendEmailCount;
+					failEmailCount = res.data.fail + failEmailCount;
 
-					// res.data.send = window.sendEmailCount;
-					// res.data.fail = window.failEmailCount;
+					res.data.send = sendEmailCount;
+					res.data.fail = failEmailCount;
 
 					if (value.index == value.batchCount)
 					{
@@ -149,7 +150,7 @@ window.tjSendEmail.UI.prototype.sendEmail = function () {
 						 // Remove below line removeclass it is temp added
 						 jQuery("div").find('.tjlms-wrapper').addClass("tjBs3");
 
-						 res.message = res.message + " successfully " + window.sendEmailCount + ", and fail " +  window.failEmailCount + ".";
+						 res.message = res.message + " successfully " + res.data.send + ", and fail " +  res.data.fail + ".";
 
 						 Joomla.renderMessages({"success":[res.message]});
 					}

@@ -145,6 +145,13 @@ class PlgSystemplg_System_Sendemail extends JPlugin
 	{
 		Session::checkToken('post') or new JResponseJson(null, Text::_('JINVALID_TOKEN_NOTICE'), true);
 
+		// Add logs
+		JLog::addLogger(
+			array(
+				'text_file' => 'sendEmail.logs.php'
+			)
+		);
+
 		if (!Factory::getUser()->id)
 		{
 			echo new JResponseJson(null, Text::_('JERROR_ALERTNOAUTHOR'), true);
@@ -177,7 +184,7 @@ class PlgSystemplg_System_Sendemail extends JPlugin
 			$emails = array_unique($emails);
 
 			// The mail subject.
-			$emailSubject = $app->input->post->get('subject');
+			$emailSubject = $app->input->post->get('subject', '', 'STRING');
 
 			// The mail body.
 			$emailBody = $app->input->post->get('message', '', 'RAW');
@@ -195,10 +202,12 @@ class PlgSystemplg_System_Sendemail extends JPlugin
 				// Check for an error.
 				if ($return !== true)
 				{
+					JLog::add(Text::sprintf('PLG_SYSTEM_SENDEMAIL_FALL_TO_SENDEMAIL', $singleEmail));
 					$failEmailcount ++;
 				}
 				else
 				{
+					JLog::add(Text::sprintf('PLG_SYSTEM_SENDEMAIL_SUCCESSFULLY_SENDEMAIL', $singleEmail));
 					$sendEmailcount ++;
 				}
 			}
@@ -206,7 +215,7 @@ class PlgSystemplg_System_Sendemail extends JPlugin
 			$emailCount['fail'] = $failEmailcount;
 			$emailCount['send'] = $sendEmailcount;
 
-			echo new JResponseJson($emailCount, JText::_('PLG_SYSTEM_SENDEMAIL_SUCCESSFULLY_SEND'), false);
+			echo new JResponseJson($emailCount, Text::_('PLG_SYSTEM_SENDEMAIL_SUCCESSFULLY_SEND'), false);
 
 			jexit();
 		}
